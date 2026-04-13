@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String?
+  role      String   @default("user")
+  image     String?
+  createdAt DateTime @default(now())
+  scans     Scan[]
+
+  @@map("users")
+}
+
+model Scan {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  message    String
+  riskScore  Int
+  riskLevel  String
+  language   String?
+  indicators Json?
+  highlights Json?
+  createdAt  DateTime @default(now())
+
+  @@map("scans")
+}
+
+model Campaign {
+  id           String   @id @default(cuid())
+  name         String
+  messageCount Int      @default(0)
+  indicators   Json?
+  firstSeen    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("campaigns")
+}
