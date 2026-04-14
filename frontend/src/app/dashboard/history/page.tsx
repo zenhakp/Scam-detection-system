@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react"
 import axios from "axios"
 import Link from "next/link"
+import { createPortal } from "react-dom"
 
 interface ScanHistoryItem {
   id:          string
@@ -146,30 +147,69 @@ export default function HistoryPage() {
     <div className="fade-in-up" style={{ maxWidth: "1100px" }}>
 
       {/* Delete confirm modal */}
-      {deleteConfirm && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, backdropFilter: "blur(4px)" }}>
-          <div className="glass rounded-2xl" style={{ padding: "36px 40px", maxWidth: "420px", width: "100%", margin: "0 16px", border: "1px solid rgba(239,68,68,0.3)" }}>
-            <h3 style={{ fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "12px" }}>
+      {deleteConfirm && typeof window !== "undefined" && createPortal(
+        <div
+          onClick={() => !deleting && setDeleteConfirm(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.8)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 99999,
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+          }}>
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: "#0D1526",
+              border: "1px solid rgba(239,68,68,0.4)",
+              borderRadius: "16px",
+              padding: "40px 44px",
+              maxWidth: "400px",
+              width: "calc(100% - 48px)",
+              boxShadow: "0 0 80px rgba(0,0,0,0.8), 0 0 40px rgba(239,68,68,0.15)",
+            }}>
+            <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#F0F4FF", marginBottom: "12px" }}>
               Confirm Delete
             </h3>
-            <p style={{ fontSize: "14px", color: "var(--text-secondary)", marginBottom: "28px", lineHeight: "1.6" }}>
-              {deleteConfirm.message} This cannot be undone.
+            <p style={{ fontSize: "14px", color: "#8892A4", marginBottom: "32px", lineHeight: "1.6" }}>
+              {deleteConfirm.message} This action cannot be undone.
             </p>
             <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
-              <button onClick={() => setDeleteConfirm(null)} disabled={deleting}
-                className="btn-ghost"
-                style={{ padding: "10px 20px", borderRadius: "10px", fontSize: "13px", fontWeight: 500, opacity: deleting ? 0.5 : 1, cursor: "pointer" }}>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                disabled={deleting}
+                style={{
+                  padding: "10px 22px", borderRadius: "10px", fontSize: "13px",
+                  fontWeight: 600, cursor: "pointer",
+                  background: "rgba(255,255,255,0.05)",
+                  color: "#8892A4",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  opacity: deleting ? 0.5 : 1,
+                }}>
                 Cancel
               </button>
-              <button onClick={executeDelete} disabled={deleting}
-                style={{ padding: "10px 20px", borderRadius: "10px", fontSize: "13px", fontWeight: 600, cursor: deleting ? "not-allowed" : "pointer", background: "rgba(239,68,68,0.15)", color: "#EF4444", border: "1px solid rgba(239,68,68,0.3)", opacity: deleting ? 0.6 : 1 }}>
+              <button
+                onClick={executeDelete}
+                disabled={deleting}
+                style={{
+                  padding: "10px 22px", borderRadius: "10px", fontSize: "13px",
+                  fontWeight: 600, cursor: deleting ? "not-allowed" : "pointer",
+                  background: "rgba(239,68,68,0.2)",
+                  color: "#EF4444",
+                  border: "1px solid rgba(239,68,68,0.4)",
+                  opacity: deleting ? 0.6 : 1,
+                }}>
                 {deleting ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
-
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px" }}>
         <div>

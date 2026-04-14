@@ -157,8 +157,12 @@ export default function DatasetPage() {
       await axios.post(`${base}/dataset/stop-training`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       })
+      // Start polling more aggressively after stop request
+      setPolling(true)
     } catch (err) {
-      console.error("Stop failed:", err)
+      // Even on error, set the polling so UI updates when training actually stops
+      console.warn("Stop request error (non-fatal):", err)
+      setPolling(true)
     } finally {
       setStopping(false)
     }
